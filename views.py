@@ -217,7 +217,7 @@ def importTable():
         fileDataframe = pd.DataFrame.from_csv(inputfile)
         dffile = 'tempDfXXX.csv'
         fileDataframe.to_csv(dffile)
-        
+        print(fileDataframe)
         
         
         

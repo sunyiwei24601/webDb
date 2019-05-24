@@ -2,7 +2,7 @@
 import csv
 
 def csv_handler(csvfile):
-	with open(csvfile, 'r', newline='') as csvfd:
+	with open(csvfile, 'r', newline='', encoding="utf-8") as csvfd:
 		reader = csv.reader(csvfd)
 		yield reader.__next__()	# extract the headers
 		# we suppose the start 2 columns are primary.
