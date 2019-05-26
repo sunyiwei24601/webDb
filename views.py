@@ -1,4 +1,5 @@
 #coding: utf8
+import chardet
 import os
 from flask import Flask, redirect, url_for, render_template, request, session, flash, send_from_directory
 from dbHandler import DbHandler, import_data_to_table, output_data_to_csv
@@ -225,8 +226,13 @@ def importTable():
     if tname and fileobj.filename.endswith('.csv'):
         inputfile = 'tempXXX.csv'
         fileobj.save(inputfile)
+        with open(inputfile, 'rb') as f:
+            data = f.read()
+            f_charInfo = chardet.detect(data)
+            print(f_charInfo)
+            
         #在这里添加处理函数
-        fileDataframe = pd.DataFrame.from_csv(inputfile)
+        fileDataframe = pd.DataFrame.from_csv(inputfile, encoding=f_charInfo['encoding'])
         dffile = 'tempDfXXX.csv'
         fileDataframe.to_csv(dffile)
         
@@ -241,8 +247,13 @@ def importTable():
         else:
             inputfile = 'tempXXX.xlsx'
         fileobj.save(inputfile)
+        with open(inputfile, 'rb') as f:
+            data = f.read()
+            f_charInfo = chardet.detect(data)
+            print(f_charInfo)
+
         #在这里添加处理函数
-        fileDataframe = pd.read_excel(inputfile)
+        fileDataframe = pd.read_excel(inputfile, encoding=f_charInfo['encoding'])
         dffile = 'tempDfXXX.csv'
         fileDataframe.to_csv(dffile, index=False)
 
