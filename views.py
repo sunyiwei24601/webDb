@@ -1,7 +1,7 @@
 #coding: utf8
 import os
-from flask import Flask, redirect, url_for, render_template, request, session, flash
-from dbHandler import DbHandler, import_data_to_table
+from flask import Flask, redirect, url_for, render_template, request, session, flash, send_from_directory
+from dbHandler import DbHandler, import_data_to_table, output_data_to_csv
 from sql import *
 import pandas as pd
 #from werkzeug.utils import secure_filename
@@ -48,6 +48,7 @@ def index():
         with DbHandler(DB_NAME) as db:
             db.execute_sql(session['sql'] % tables[0])
             entries = db.get_all_records()
+            
         session['sql'] = DEFAULT_SQL	# back to initial sql.
         num = len(entries)
         headers = entries[0].keys() if num else []
@@ -65,6 +66,7 @@ def switchTable():
     tables.remove(new_table)
     tables.insert(0, new_table)
     session['tables'] = tables
+    print("this is switch working", session['tables'])
     return redirect(url_for('index'))
   
     
@@ -170,6 +172,14 @@ def addRow():
         insert_sql = INSERT_DATA_SQL.format(session['tables'][0], ','.join(fields)) %("','".join(values))
         with DbHandler(DB_NAME) as db:
             db.execute_sql(insert_sql)
+    tables = session.get('tables', [])
+    with DbHandler(DB_NAME) as db:
+        pd_csv = pd.read_sql("select * from {table}".format(table=tables[0]), db.conn)
+        pd_csv.to_csv("{}.csv".format(tables[0]))
+    filename = "{}.csv".format(tables[0])
+    if os.path.exists(filename):
+        print("this is addrow working**********")
+        return send_from_directory(r'C:\Users\Carl\Documents\PyProjects\WebDb', filename, as_attachment=True)
     return redirect(url_for('index'))
 
 
@@ -191,7 +201,9 @@ def dropRow():
 def updateData():
     update_part = ''
     condition = ''
+    
     for k, v in request.args.items():
+        
         if v:
             if k.startswith('new'):
                 update_part += "%s='%s'," %(k[3:], v)
@@ -217,15 +229,29 @@ def importTable():
         fileDataframe = pd.DataFrame.from_csv(inputfile)
         dffile = 'tempDfXXX.csv'
         fileDataframe.to_csv(dffile)
-        print(fileDataframe)
-        
-        
         
         import_data_to_table(tname, dffile)
         os.remove(inputfile)
         tables = session['tables']
         tables.append(tname)
         session['tables'] = list(set(tables))
+    if tname and (fileobj.filename.endswith('.xls') or fileobj.filename.endswith('.xlsx')) :
+        if fileobj.filename.endswith('.xls'):
+            inputfile = 'tempXXX.xls'
+        else:
+            inputfile = 'tempXXX.xlsx'
+        fileobj.save(inputfile)
+        #在这里添加处理函数
+        fileDataframe = pd.read_excel(inputfile)
+        dffile = 'tempDfXXX.csv'
+        fileDataframe.to_csv(dffile, index=False)
+
+        import_data_to_table(tname, dffile)
+        os.remove(inputfile)
+        tables = session['tables']
+        tables.append(tname)
+        session['tables'] = list(set(tables))
+    
     return redirect(url_for('index'))
 
 
@@ -239,3 +265,17 @@ def dropTable():
             tables.remove(k)
     session['tables'] = tables
     return redirect(url_for('index'))
+
+
+@app.route('/output/')
+def output():
+    tables = session.get('tables', [])
+    print("this is output process", tables)
+    with DbHandler(DB_NAME) as db:
+        pd_csv = pd.read_sql("select * from {table}".format(table=tables[0]), db.conn)
+        pd_csv.to_csv("{}.csv".format(tables[0]))
+    filename = "{}.csv".format(tables[0])
+    if os.path.exists(filename):
+        print("this is output**********")
+        return send_from_directory(r'C:\Users\Carl\Documents\PyProjects\WebDb', filename, as_attachment=True)
+    

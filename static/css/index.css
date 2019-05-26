@@ -1,7 +1,8 @@
 body{
-	background-color: #FFCCFF;
+	background-color: white;
 }
-.mycontainer{ 
+
+.mycontainer{
 	margin: 10px;
 	width: auto;
 	height: 550px;

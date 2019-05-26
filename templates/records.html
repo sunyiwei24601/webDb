@@ -54,7 +54,7 @@
 						<label for="curTable"><b>选择操作表</b></label>
 						<form action="{{url_for('switchTable')}}" method='get'>
 							<div>
-								<select name="currentTable" id="curTable">
+								<select name="currentTable" id="curTable" style="width:100px">
 									{% for table in tables %}
 									<option value="{{table}}">{{table}}</option>
 									{% endfor %}
@@ -82,8 +82,8 @@
 					<button type="button" class="btn btn-default btn-link" data-toggle="modal" data-target="#dropRow">
 						<span class="glyphicon glyphicon-plus"></span> 删除行数据
 					</button>
-					<button type="button" class="btn btn-default btn-link" data-toggle="modal" data-target="#update">
-						<span class="glyphicon glyphicon-edit"></span> 修改数据
+					<button type="button" class="btn btn-default btn-link" data-toggle="modal" data-target="#output"  >
+						<span class="glyphicon glyphicon-edit"></span> 导出数据
 					</button>
 					<button type="button" class="btn btn-default btn-link" data-toggle="modal" data-target="#import">
 						<span class="glyphicon glyphicon-import"></span> 导入新表
@@ -95,25 +95,27 @@
 			</div>
 
 			<div class="dataArea">
-				<table class="table table-bordered table-hover table-condensed" onmouseover="getrow(this)" onmouseout="backrow(this)" onclick="selectRow(this)">
+				<table style="table-layout: fixed;word-wrap: break-word" class="table table-bordered table-hover table-condensed" onmouseover="getrow(this)" onmouseout="backrow(this)" onclick="selectRow(this)">
 					<thead>
 						{% for errmsg in get_flashed_messages() %}
 						<tr><th class="error">{{errmsg}}</th></tr>
 						{% endfor %}
 						<tr>
-							{% for header in headers %}
-							<th>{{header}}</th>
-							{% endfor %}
                             <th>序号</th>
+							{% for header in headers %}
+							<th >{{header}}</th>
+							{% endfor %}
+
 						</tr>
 					</thead>
 					<tbody>
 						{% for row in entries %}
 						    <tr>
+                                <td>{{ loop.index}} </td>
 							{% for column in row %}
-							    <td>{{column}}</td>
+							    <td width="40px">{{column}}</td>
 							{% endfor %}
-                            <td>{{ loop.index}} </td>
+
 						    </tr>
 						{% endfor %}
 					</tbody>
@@ -138,13 +140,13 @@
 							<div class="form-group">
 								<label class="col-sm-2 control-label" for="username">账号：</label>
 								<div class="col-sm-10">
-									<input class="form-control" name="username" id="username">
+									<input class="form-control" name="username" id="username" value="root">
 								</div>
 							</div>
 							<div class="form-group">
 								<label class="col-sm-2 control-label" for="pword">密码：</label>
 								<div class="col-sm-10">
-									<input type="password" class="form-control" name="password" id="pword">
+									<input type="password" class="form-control" name="password" id="pword" value="root123">
 								</div>
 							</div>
 							<div class="submitBtn">
@@ -473,6 +475,30 @@
 							{% endif %}
 						</form>
 					</div>
+				</div><!-- /.modal-content -->
+			</div><!-- /.modal -->
+		</div>
+
+        <div class="modal fade" id="output" role="dialog">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title prompt">
+							表导出
+						</h4>
+					</div>
+
+
+                    <div>
+                        正在导出数据.....
+                    </div>
+                    <form action="{{ url_for("output") }}" method="get">
+                      <input type="submit" value="确定导出" />
+                    </form>
+                </div>
 				</div><!-- /.modal-content -->
 			</div><!-- /.modal -->
 		</div>

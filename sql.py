@@ -67,3 +67,5 @@ DELETE_DATA_SQL = "delete from %s"
 UPDATE_DATA_SQL = "update %s set %s"
 
 SELECT_ALL_DATA_SQL = "select * from %s"
+
+OUTPUT_DATA_SQL = ".output {tables}.csv"

@@ -50,8 +50,8 @@ function selectRow(obj) {
         var modal = document.getElementsByClassName("query_condition");
         items = document.getElementsByTagName("tr")
         for (var i = 0; i < length-1; i++ ){
-            modal[i].getElementsByTagName('input')[0].value = items[row].cells[i].innerHTML;
-            modal[i].getElementsByTagName('input')[1].value = items[row].cells[i].innerHTML;
+            modal[i].getElementsByTagName('input')[0].value = items[row].cells[i+1].innerHTML;
+            modal[i].getElementsByTagName('input')[1].value = items[row].cells[i+1].innerHTML;
 
         }
 
