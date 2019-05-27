@@ -7,7 +7,7 @@ from sql import *
 import pandas as pd
 from show_plot import *
 #from werkzeug.utils import secure_filename
-
+import sys
 app = Flask(__name__)
 
 DEFAULT_SQL = SELECT_ALL_DATA_SQL
@@ -289,7 +289,7 @@ def output():
     filename = "{}.csv".format(tables[0])
     if os.path.exists(filename):
         print("this is output**********")
-        return send_from_directory(r'C:\Users\Carl\Documents\PyProjects\WebDb', filename, as_attachment=True)
+        return send_from_directory(r'.\\', filename, as_attachment=True)
 
 
 @app.route('/show_image/')
