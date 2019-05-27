@@ -5,6 +5,7 @@ from flask import Flask, redirect, url_for, render_template, request, session, f
 from dbHandler import DbHandler, import_data_to_table, output_data_to_csv
 from sql import *
 import pandas as pd
+from show_plot import *
 #from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
@@ -57,7 +58,7 @@ def index():
         sql = DEFAULT_SQL + ' limit 1;'
         allFields = get_table_fields(sql %tables[0])
     return render_template('records.html', headers=headers, allFields=allFields, isRoot=isRoot,
-                        tables=tables, entries=entries, num=num, isLogin=isLogin, user=curUser)
+                        tables=tables, entries=entries, num=num, isLogin=isLogin, user=curUser, show_image="true")
 
 
 @app.route('/tables/')
@@ -289,4 +290,37 @@ def output():
     if os.path.exists(filename):
         print("this is output**********")
         return send_from_directory(r'C:\Users\Carl\Documents\PyProjects\WebDb', filename, as_attachment=True)
+
+
+@app.route('/show_image/')
+def show_image():
+    field = list(request.args.values())[0]
+    with DbHandler(DB_NAME) as db:
+        df = pd.read_sql("select {field} from {table}".format(field=field, table = session.get('tables', [])[0]), db.conn)
+        counts = counts_max(df[field], 10)
+        print_pie(counts, field)
     
+    headers = ["***** 登录后才可查看更多哦 *****"]
+    allFields = []
+    entries = []
+    tables = []
+    num = 0
+    isLogin = False
+    isRoot = False
+    curUser = session.get('user', None)
+    if curUser:
+        isLogin = True
+        isRoot = True if curUser == "root" else False
+        tables = session['tables']
+        with DbHandler(DB_NAME) as db:
+            db.execute_sql(session['sql'] % tables[0])
+            entries = db.get_all_records()
+    
+        session['sql'] = DEFAULT_SQL  # back to initial sql.
+        num = len(entries)
+        headers = entries[0].keys() if num else []
+        entries = (tuple(entry) for entry in entries)
+        sql = DEFAULT_SQL + ' limit 1;'
+        allFields = get_table_fields(sql % tables[0])
+    return render_template('images.html', headers=headers, allFields=allFields, isRoot=isRoot,
+                           tables=tables, entries=entries, num=num, isLogin=isLogin, user=curUser)

@@ -100,31 +100,7 @@
 			</div>
 
 			<div class="dataArea">
-                <table style="table-layout: fixed;word-wrap: break-word" class="table table-bordered table-hover table-condensed" onmouseover="getrow(this)" onmouseout="backrow(this)" onclick="selectRow(this)">
-					<thead>
-						{% for errmsg in get_flashed_messages() %}
-						<tr><th class="error">{{errmsg}}</th></tr>
-						{% endfor %}
-						<tr>
-                            <th>序号</th>
-							{% for header in headers %}
-							<th >{{header}}</th>
-							{% endfor %}
-
-						</tr>
-					</thead>
-					<tbody>
-						{% for row in entries %}
-						    <tr>
-                                <td>{{ loop.index}} </td>
-							{% for column in row %}
-							    <td width="40px">{{column}}</td>
-							{% endfor %}
-
-						    </tr>
-						{% endfor %}
-					</tbody>
-				</table>
+                <p><img src="{{ url_for('static', filename='images/tempShow.jpg')}}">
 				<strong>共计{{num}}行数据。</strong>
 			</div>
 		</div>
@@ -528,7 +504,7 @@
 							</div>
 							{% endfor %}
 							<div class="submitBtn">
-								<button type="submit" class="btn btn-primary" >提交</button>
+								<button type="submit" class="btn btn-primary">提交</button>
 							</div>
 							{% endif %}
 						</form>
